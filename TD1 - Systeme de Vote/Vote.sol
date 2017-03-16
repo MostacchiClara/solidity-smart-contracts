@@ -1,3 +1,4 @@
+
 pragma solidity ^0.4.0;
 contract Vote {
 
@@ -21,16 +22,13 @@ contract Vote {
     }
 
     // Allow voters to vote, take in argument the proposal
-    function letsVote(uint proposal)
-    {
-        for(uint i = 0; i< voters.length ; i++)
-        {
-            if(msg.sender == voters[i].addresse)
-            {
+    function letsVote(uint _aProposal){
+        for(uint i = 0; i< voters.length ; i++){
+            if(msg.sender == voters[i].addresse){
                 if(voters[i].voted) throw;
                 voters[i].voted = true;
-                proposals[proposal].voteCount += 1;
-                voters[i].vote = proposal;
+                proposals[_aProposal].voteCount += 1;
+                voters[i].vote = _aProposal;
             }
         }
     }
@@ -38,22 +36,18 @@ contract Vote {
     // Allow to add a new voter to the voters tab this operation can be only
     // perform by the chairman, the voter mustn't being already present in the tab
     // Takes in parameter the address of the voter
-    function addVoter(address newVoter) {
+    function addVoter(address _aNewVoter) {
         bool present = false;
-        if (msg.sender != chairperson)
-        {
+        if (msg.sender != chairperson){
             throw;
         }
-        for(uint i = 0; i< voters.length ; i++)
-        {
-            if(newVoter == voters[i].addresse)
-            {
+        for(uint i = 0; i< voters.length ; i++){
+            if(_aNewVoter == voters[i].addresse){
                 present = true ;
             }
         }
-        if(!present)
-        {
-            voters.push(Voter({voted : false, addresse : newVoter, vote : 0 }));
+        if(!present){
+            voters.push(Voter({voted : false, addresse : _aNewVoter, vote : 0 }));
         }
 
     }
@@ -62,30 +56,30 @@ contract Vote {
     // perform by the chairman
     // Takes in parameter the name of the proposal
 	
-    function addProposal(bytes32 newProposal) {
+    function addProposal(bytes32 _aNewProposal) {
         bool present = false;
-        if (msg.sender != chairperson)
-        {
+        if (msg.sender != chairperson){
             throw;
         }
-        for(uint i = 0; i< proposals.length ; i++)
-        {
-            if(newProposal == proposals[i].name) throw;
-            proposals.push( Proposal({name : newProposal , voteCount : 0 }));
+        for(uint i = 0; i< proposals.length ; i++){
+            if(_aNewProposal == proposals[i].name){
+                throw;  
+            } 
+            else{
+                proposals.push( Proposal({name : _aNewProposal , voteCount : 0 }));
+            }
         }
     }
 
-    function winningProposal() constant returns (uint winningProposal)
-    {
+    function winningProposal() constant returns (uint){
         if (msg.sender != chairperson) throw;
         else{
             uint winningVoteCount = 0;
             for (uint i = 0; i < proposals.length; i++) {
-                
                 if (proposals[i].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[i].voteCount;
-                winningProposal = i;
-                }
+               }
+            return i;
             }
         }
     }
