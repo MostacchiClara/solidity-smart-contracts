@@ -20,6 +20,14 @@ contract Vote {
     function Vote() {
         chairperson = msg.sender;
     }
+    
+    modifier isChairPersonn(){
+        if (msg.sender != chairperson)
+               throw;
+        _;
+        
+    }
+    
 
     // Allow voters to vote, take in argument the proposal
     function letsVote(uint _aProposal){
@@ -36,11 +44,8 @@ contract Vote {
     // Allow to add a new voter to the voters tab this operation can be only
     // perform by the chairman, the voter mustn't being already present in the tab
     // Takes in parameter the address of the voter
-    function addVoter(address _aNewVoter) {
+    function addVoter(address _aNewVoter) isChairPersonn() {
         bool present = false;
-        if (msg.sender != chairperson){
-            throw;
-        }
         for(uint i = 0; i< voters.length ; i++){
             if(_aNewVoter == voters[i].addresse){
                 present = true ;
@@ -56,11 +61,8 @@ contract Vote {
     // perform by the chairman
     // Takes in parameter the name of the proposal
 	
-    function addProposal(bytes32 _aNewProposal) {
+    function addProposal(bytes32 _aNewProposal) isChairPersonn(){
         bool present = false;
-        if (msg.sender != chairperson){
-            throw;
-        }
         for(uint i = 0; i< proposals.length ; i++){
             if(_aNewProposal == proposals[i].name){
                 throw;  
@@ -71,23 +73,18 @@ contract Vote {
         }
     }
 
-    function winningProposal() constant returns (uint){
-        if (msg.sender != chairperson) throw;
-        else{
-            uint winningVoteCount = 0;
-            for (uint i = 0; i < proposals.length; i++) {
-                if (proposals[i].voteCount > winningVoteCount) {
+    function winningProposal() isChairPersonn() constant returns (uint){
+        uint winningVoteCount = 0;
+        for (uint i = 0; i < proposals.length; i++) {
+            if (proposals[i].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[i].voteCount;
-               }
-            return i;
             }
+            return i;
         }
     }
     
      
-    function kill() {
-        if (msg.sender == chairperson) {
-            suicide(chairperson);
-        }else{ throw;}
+    function kill() isChairPersonn {
+        suicide(chairperson);
     }
 }
