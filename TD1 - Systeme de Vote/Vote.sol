@@ -13,11 +13,15 @@ contract Vote {
 
     struct Proposal {
         uint voteCount;
-        bytes32 nom;
+        bytes32 name;
+    }
+    
+    function Vote() {
+        chairperson = msg.sender;
     }
 
     // Allow voters to vote, take in argument the proposal
-    function LetsVote(uint proposal)
+    function letsVote(uint proposal)
     {
         for(uint i = 0; i< voters.length ; i++)
         {
@@ -57,6 +61,7 @@ contract Vote {
     // Allow to add a new proposal to proposals tab this operation can be only
     // perform by the chairman
     // Takes in parameter the name of the proposal
+	
     function addProposal(bytes32 newProposal) {
         bool present = false;
         if (msg.sender != chairperson)
@@ -65,25 +70,30 @@ contract Vote {
         }
         for(uint i = 0; i< proposals.length ; i++)
         {
-            if(newProposal == proposals[i].nom) throw;
-            proposals.push( Proposal({nom : newProposal , voteCount : 0 }));
+            if(newProposal == proposals[i].name) throw;
+            proposals.push( Proposal({name : newProposal , voteCount : 0 }));
         }
     }
 
     function winningProposal() constant returns (uint winningProposal)
     {
-        uint winningVoteCount = 0;
-        for (uint i = 0; i < proposals.length; i++) {
-            if (proposals[i].voteCount > winningVoteCount) {
+        if (msg.sender != chairperson) throw;
+        else{
+            uint winningVoteCount = 0;
+            for (uint i = 0; i < proposals.length; i++) {
+                
+                if (proposals[i].voteCount > winningVoteCount) {
                 winningVoteCount = proposals[i].voteCount;
                 winningProposal = i;
+                }
             }
         }
     }
-
-    function winnerName() constant
-            returns (bytes32 winnerName)
-    {
-        winnerName = proposals[winningProposal()].nom;
+    
+     
+    function kill() {
+        if (msg.sender == chairperson) {
+            suicide(chairperson);
+        }else{ throw;}
     }
 }
